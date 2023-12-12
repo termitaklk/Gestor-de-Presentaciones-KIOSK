@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Presentaciones y Carga de Imagen</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .presentation {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="presentationContainer" style="display: none;">
+        <iframe class="presentation" src=""
+            style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+    </div>
+
+    <script>
+        var presentacion1_url = "";
+        var presentacion2_url = "";
+        var presentacion3_url = "";
+        var presentacion4_url = "";
+        var presentacion5_url = "";
+        var hora = "";
+        var min = "";
+
+        var enablePresentaciones = "";
+        var enablePresentacion1 = "";
+        var enablePresentacion2 = "";
+        var enablePresentacion3 = "";
+        var enablePresentacion4 = "";
+        var enablePresentacion5 = "";
+
+        function procesarDatos(data) {
+
+            var hora_presentacion1 = new Date();
+
+            var hora_presentacion2 = new Date();
+
+            var hora_presentacion3 = new Date();
+
+            var hora_presentacion4 = new Date();
+
+            var hora_presentacion5 = new Date();
+
+
+            var urlPresentacionMasCercana = obtenerPresentacionMasCercana(data);
+            console.log("Ultima",urlPresentacionMasCercana)
+        
+            var values = data;
+            var ultimapresentacionURL = "";
+
+            for (var i = 0; i < values.length; i++) {
+                var ID = values[i]["ID"];
+                var URLP = values[i]["URLP"];
+                var Hora = values[i]["Hora"];
+                var Minuto = values[i]["Minuto"];
+                var Activo = values[i]["Activo"];
+
+                if (ID === "Presentacion1") {
+                    presentacion1_url = URLP;
+                    hora_presentacion1.setHours(Hora);
+                    hora_presentacion1.setMinutes(Minuto);
+                    enablePresentacion1 = Activo;
+
+                } else if (ID === "Presentacion2") {
+                    presentacion2_url = URLP;
+                    hora_presentacion2.setHours(Hora);
+                    hora_presentacion2.setMinutes(Minuto);
+                    enablePresentacion2 = Activo;
+
+                } else if (ID === "Presentacion3") {
+                    presentacion3_url = URLP;
+                    hora_presentacion3.setHours(Hora);
+                    hora_presentacion3.setMinutes(Minuto);
+                    enablePresentacion3 = Activo;
+
+                } else if (ID === "Presentacion4") {
+                    presentacion4_url = URLP;
+                    hora_presentacion4.setHours(Hora);
+                    hora_presentacion4.setMinutes(Minuto);
+                    enablePresentacion4 = Activo;
+
+                } else if (ID === "Presentacion5") {
+                    presentacion5_url = URLP;
+                    hora_presentacion5.setHours(Hora);
+                    hora_presentacion5.setMinutes(Minuto);
+                    enablePresentacion5 = Activo;
+
+                }
+            }
+
+            var now = new Date();
+            var currentHour = now.getHours();
+            var currentMinutes = now.getMinutes();
+            var presentationContainer = document.getElementById("presentationContainer");
+            var presentationFrame = presentationContainer.querySelector("iframe");
+
+            var isActivePresentation = false;
+            var ultimapresentacion;
+
+            if (enablePresentacion1 && currentHour === hora_presentacion1.getHours() && currentMinutes === hora_presentacion1.getMinutes()) {
+                currentPresentation = presentacion1_url;
+                isActivePresentation = true;
+
+            } else if (enablePresentacion2 && currentHour === hora_presentacion2.getHours() && currentMinutes === hora_presentacion2.getMinutes()) {
+                currentPresentation = presentacion2_url;
+                isActivePresentation = true;
+
+            } else if (enablePresentacion3 && currentHour === hora_presentacion3.getHours() && currentMinutes === hora_presentacion3.getMinutes()) {
+                currentPresentation = presentacion3_url;
+                isActivePresentation = true;
+
+            } else if (enablePresentacion4 && currentHour === hora_presentacion4.getHours() && currentMinutes === hora_presentacion4.getMinutes()) {
+                currentPresentation = presentacion4_url;
+                isActivePresentation = true;
+
+            } else if (enablePresentacion5 && currentHour === hora_presentacion5.getHours() && currentMinutes === hora_presentacion5.getMinutes()) {
+                currentPresentation = presentacion5_url;
+                isActivePresentation = true;
+
+            } else {
+                // Actualizamos el iframe con la última presentación
+                var presentationContainer = document.getElementById("presentationContainer");
+                var presentationFrame = presentationContainer.querySelector("iframe");
+                presentationFrame.src = ultimapresentacionURL;
+                presentationContainer.style.display = "block";
+
+            }
+
+
+            if (isActivePresentation) {
+                // Solo establece la URL de la presentación si está activa
+                presentationFrame.src = currentPresentation;
+                presentationContainer.style.display = "block";
+                
+
+            } else {
+                // Si no hay presentación activa, oculta el contenedor de la presentación
+                presentationFrame.src = urlPresentacionMasCercana;
+                presentationContainer.style.display = "block";
+
+            }
+
+        }
+
+        function obtenerPresentacionMasCercana(presentaciones) {
+    var ahora = new Date();  // Hora actual
+
+    // Inicializamos la diferencia de tiempo con un valor grande para asegurarnos de que se actualizará en la primera iteración
+    var diferenciaMinima = Infinity;
+    var presentacionMasCercanaURL = '';
+
+    for (var i = 0; i < presentaciones.length; i++) {
+        var presentacion = presentaciones[i];
+        var hora_presentacion = new Date(ahora);
+        hora_presentacion.setHours(presentacion.Hora);
+        hora_presentacion.setMinutes(presentacion.Minuto);
+        hora_presentacion.setSeconds(0);  // Ajustamos los segundos a 0 para evitar imprecisiones
+
+        // Verificar si la presentación está en el futuro
+        if (hora_presentacion > ahora) {
+            // Si la presentación está en el futuro, continuamos con la siguiente iteración
+            continue;
+        }
+
+        var diferencia = Math.abs(hora_presentacion - ahora);  // La diferencia se obtiene en milisegundos
+
+        // Convertimos la diferencia a días, horas y minutos
+        var dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+        var horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+
+        console.log("Presentación:", presentacion);
+        console.log("Diferencia:", dias + " días, " + horas + " horas, " + minutos + " minutos.");
+
+        if (presentacion.Activo && diferencia < diferenciaMinima) {
+            diferenciaMinima = diferencia;
+            presentacionMasCercanaURL = presentacion.URLP;
+        }
+    }
+
+    console.log("URL de la presentación más cercana:", presentacionMasCercanaURL);
+    return presentacionMasCercanaURL;
+}
+
+
+
+        function obtenerDatosDeScript() {
+            $.get('https://script.google.com/macros/s/AKfycbwQp4MlnIOHYGYVQo1wCSKzS6hVKa-PYugShwPACcsiSut1DltytZw_TV999r-1nQpl-g/exec', function (data) {
+                procesarDatos(data);
+            });
+        }
+
+        // Llama a la función obtenerDatosDeScript cada 10 segundos (10000 ms)
+        setInterval(obtenerDatosDeScript, 3600000);
+
+        // Llama a obtenerDatosDeScript al cargar la página
+        obtenerDatosDeScript();
+    </script>
+</body>
+
+</html>
